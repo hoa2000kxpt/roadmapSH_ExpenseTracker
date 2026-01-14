@@ -1,7 +1,8 @@
 import argparse
-from repository import ExpenseRepository
-from service import ExpenseService
-from logger import get_logger
+from expense_tracker.repository import ExpenseRepository
+from expense_tracker.service import ExpenseService
+from expense_tracker.logger import get_logger
+from expense_tracker.utils import print_table
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -65,12 +66,14 @@ def main():
 
         elif args.command == "list":
             expenses = service.list_expenses(args.category)
-            print("ID  Date        Description  Amount  Category")
             for e in expenses:
-                print(
-                    f"{e['id']}  {e['date']}  {e['description']}  "
-                    f"${e['amount']}  {e['category']}"
-                )
+                e["amount"] = f"${e['amount']:.2f}"
+                e["category"] = e["category"].lower()
+
+            print_table(
+                expenses,
+                headers=["id", "date", "description", "amount", "category"]
+            )
 
         elif args.command == "summary":
             total, budget, warning = service.summary(args.month)

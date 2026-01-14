@@ -1,0 +1,6 @@
+[project]
+name = "expense-tracker"
+version = "0.1.0"
+
+[project.scripts]
+expense-tracker = "expense_tracker.main:main"
