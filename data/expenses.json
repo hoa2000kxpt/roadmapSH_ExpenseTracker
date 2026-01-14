@@ -1,0 +1,19 @@
+{
+  "expenses": [
+    {
+      "id": 1,
+      "description": "Lunch",
+      "amount": 20.0,
+      "category": "general",
+      "date": "2026-01-13"
+    },
+    {
+      "id": 2,
+      "description": "Dinner",
+      "amount": 10.0,
+      "category": "food",
+      "date": "2026-01-13"
+    }
+  ],
+  "budgets": {}
+}
