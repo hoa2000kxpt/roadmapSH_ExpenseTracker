@@ -75,18 +75,18 @@ class ExpenseRepository:
 
     def delete(self, expense_id):
         data = self._read()
-        expenses = data["expenses"]
+        expenses = data
         updated = [e for e in expenses if e["id"] != expense_id]
 
         if len(updated) == len(expenses):
             raise ExpenseNotFoundError(f"Expense {expense_id} not found")
 
-        data["expenses"] = updated
+        data = updated
         self._write(data)
 
     def update(self, expense_id: int, **fields) -> Dict:
         data = self._read()
-        for expense in data["expenses"]:
+        for expense in data:
             if expense["id"] == expense_id:
                 for key, value in fields.items():
                     if value is not None:
