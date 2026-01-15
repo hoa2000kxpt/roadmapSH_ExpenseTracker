@@ -1,16 +1,51 @@
 import json
 from pathlib import Path
 from datetime import date
-from typing import List, Dict
+from typing import List, Dict, Any
 from expense_tracker.models import Expense
+from abc import ABC, abstractmethod
 from expense_tracker.logger import get_logger
 
 logger = get_logger()
 
+# --- Custom Exception ---
 class ExpenseNotFoundError(Exception):
+    """Raised when an operation is performed on a non-existent expense."""
     pass
 
-class ExpenseRepository:
+# --- Interface ---
+class InterfaceExpenseRepository(ABC):
+    """
+    Abstract Base Class defining the contract for Expense data persistence.
+    """
+    @abstractmethod
+    def add(self, description: str, amount: float, category: str = None) -> int: pass
+
+    @abstractmethod
+    def update(self, expense: Expense) -> bool: pass
+
+    @abstractmethod
+    def delete(self, expense_id: int) -> bool: pass
+
+    @abstractmethod
+    def list(self) -> List[Dict[str, Any]]: pass
+
+    @abstractmethod
+    def get(self, expense_id: int) -> Dict[str, Any]: pass
+
+    @abstractmethod
+    def filter_by_category(self, category: str) -> List[Dict[str, Any]]: pass
+
+    @abstractmethod
+    def filter_by_month(self, month: int) -> List[Dict[str, Any]]: pass
+
+    # @abstractmethod
+    # def get_budget(self, month: int) -> float: pass
+    #
+    # @abstractmethod
+    # def set_budget(self, month: int, amount: float): pass
+
+class ExpenseRepository(InterfaceExpenseRepository):
     def __init__(self, filepath="data/expenses.json"):
         self.file_path = Path(filepath)
         self.file_path.parent.mkdir(exist_ok=True)
@@ -46,7 +81,7 @@ class ExpenseRepository:
         return max((expense["id"] for expense in data), default=0) + 1
 
     # ---------- CRUD operation ----------
-    def add(self, description: str, amount: float, category: str) -> dict:
+    def add(self, description: str, amount: float, category: str = None) -> dict:
         if amount <= 0:
             raise ValueError("Amount must be positive")
 

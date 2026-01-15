@@ -1,21 +1,9 @@
 import pytest
 from datetime import datetime
 import json
-from expense_tracker.repository import ExpenseRepository
 from expense_tracker.repository import ExpenseNotFoundError
 
-@pytest.fixture
-def repo(tmp_path):
-    # tmp_path is a built-in pytest fixture that provides a temporary directory unique to this test invocation
 
-    # 1. Create a path to a temporary JSON file
-    test_file = tmp_path / "test_expenses.json"
-
-    # 2. Initialize the repository with this temporary file
-    repository = ExpenseRepository(filepath=test_file)
-
-    # 3. Return the repository instance to the test function
-    return repository
 
 def test_add_expense(repo):
     # This now uses the fresh temporary file from the fixture above
@@ -31,6 +19,16 @@ def test_add_expense(repo):
         data = json.load(f)
         assert len(data) == 1
         assert data[0]["description"] == "Lunch"
+
+def test_add_expense_without_category(repo):
+    # This now uses the fresh temporary file from the fixture above
+    expense = repo.add("Lunch", 20)
+
+    # This assertion is now safe because the file is always empty at the start of the test
+    assert expense["id"] == 1
+    assert expense["description"] == "Lunch"
+    assert expense["amount"] == 20
+    assert expense["category"] == "general"
 
 
 def test_list_expenses(repo):

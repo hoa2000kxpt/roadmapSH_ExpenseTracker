@@ -1,5 +1,6 @@
 import pytest
-
+from expense_tracker.service import ExpenseService
+from expense_tracker.logger import get_logger
 
 def test_add_expense(service):
     expense = service.add_expense("Lunch", 20, "food")

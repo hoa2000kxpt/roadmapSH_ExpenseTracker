@@ -1,11 +1,13 @@
 import csv
 from typing import List, Tuple
+from expense_tracker.logger import get_logger
+from expense_tracker.models import Expense
 
+logger = get_logger()
 
 class ExpenseService:
-    def __init__(self, repo, logger):
+    def __init__(self, repo):
         self.repo = repo
-        self.logger = logger
 
     # ---------- Commands logic ----------
     def add_expense(self, description: str, amount: float, category: str):
@@ -14,9 +16,13 @@ class ExpenseService:
         if amount <= 0:
             raise ValueError("Amount must be positive")
 
-        expense = self.repo.add(description, amount, category)
-        self.logger.info(f"Added expense {expense["id"]}")
-        return expense
+        try:
+            expense_id = self.repo.add(description, amount, category)
+            logger.info(f"Expense added successfully (ID: {expense_id})")
+            return expense_id
+        except Exception as e:
+            logger.error(f"Failed to add expense: {str(e)}")
+            raise
 
     def update_expense(
             self,
@@ -34,12 +40,12 @@ class ExpenseService:
             amount=amount,
             category=category,
         )
-        self.logger.info(f"Updated expense {expense_id}")
+        logger.info(f"Updated expense {expense_id}")
         return updated
 
     def delete_expense(self, expense_id: int):
         self.repo.delete(expense_id)
-        self.logger.info(f"Expense deleted: {expense_id}")
+        logger.info(f"Expense deleted: {expense_id}")
 
     # ---------- Queries ----------
     def list_expenses(self, category=None) -> List[dict]:
@@ -69,3 +75,6 @@ class ExpenseService:
             )
             writer.writeheader()
             writer.writerows(expenses)
+
+    def get_budget(self, month: int | None = None) -> float | None:
+        return self.repo.get_budget(month)
